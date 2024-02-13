@@ -30,29 +30,66 @@ exports.readAll = (callback) => {
     if (err) {
       throw ('Cannot read data directory');
     }
-
     //    -  "00001.txt"
-    // -  "00002.txt"
     files.map((file) => {
       var currentId = path.basename(file, '.txt');
       todoList.push({id: currentId, text: currentId});
     });
     callback(null, todoList);
   });
-  // var data = _.map(items, (text, id) => {
-  //   return { id, text };
-  // });
-  // callback(null, data);
+
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+
+  var currentPath = `${exports.dataDir}/${id}.txt`;
+
+  fs.readFile(currentPath, 'utf8', (err, text) => {
+    if (err) {
+      if (err.code === 'ENOENT') {
+        callback('no file with id');
+      } else {
+        callback('cannot read file');
+      }
+    } else {
+      callback(null, {id: id, text: text});
+    }
+  });
+
+
+  // fs.readdir(exports.dataDir, (err, files) => {
+  //   if (err) {
+  //     throw ('Err');
+  //   }
+  //   files.map((file) => {
+  //     if (path.basename(file, '.txt') === id) {
+  //       fs.readFile(currentPath, (err, text) => {
+  //         if (err) {
+  //           callback('Error could not read file');
+  //         }
+  //         console.log(currentPath);
+  //         callback(null, {id: id, text: text});
+  //       });
+  //     }
+  //   });
+
+// callback('Could not find file');
+
 };
+
+
+
+  // check if current Path exists first
+
+
+
+  // var text = items[id];
+  // if (!text) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback(null, { id, text });
+  // }
+
 
 exports.update = (id, text, callback) => {
   var item = items[id];
