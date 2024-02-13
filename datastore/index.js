@@ -10,12 +10,12 @@ var items = {};
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id) => {
     if (err) {
-      throw ('Error could not get nextID:');
+      callback('Error could not get nextID:');
     }
     var newFile = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(newFile, text, (err) => {
       if (err) {
-        throw ('could not write text');
+        callback('could not write text');
       } else {
         callback(null, {id, text});
       }
@@ -41,64 +41,63 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-
-  var currentPath = `${exports.dataDir}/${id}.txt`;
+  //  var currentPath = path.join(exports.dataDir, `${id}.txt`);
+  var currentPath = path.join(exports.dataDir, `${id}.txt`);
 
   fs.readFile(currentPath, 'utf8', (err, text) => {
     if (err) {
-      if (err.code === 'ENOENT') {
-        callback('no file with id');
-      } else {
-        callback('cannot read file');
-      }
+      callback('cannot read file');
     } else {
       callback(null, {id: id, text: text});
     }
   });
-
-
-  // fs.readdir(exports.dataDir, (err, files) => {
-  //   if (err) {
-  //     throw ('Err');
-  //   }
-  //   files.map((file) => {
-  //     if (path.basename(file, '.txt') === id) {
-  //       fs.readFile(currentPath, (err, text) => {
-  //         if (err) {
-  //           callback('Error could not read file');
-  //         }
-  //         console.log(currentPath);
-  //         callback(null, {id: id, text: text});
-  //       });
-  //     }
-  //   });
-
-// callback('Could not find file');
-
 };
 
 
-
-  // check if current Path exists first
-
+// check if current Path exists first
 
 
-  // var text = items[id];
-  // if (!text) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   callback(null, { id, text });
-  // }
+
+// var text = items[id];
+// if (!text) {
+//   callback(new Error(`No item with id: ${id}`));
+// } else {
+//   callback(null, { id, text });
+// }
 
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  //create current path
+  var currentPath = path.join(exports.dataDir, `${id}.txt`);
+  //read the file for update
+  fs.readFile(currentPath, 'utf8', (err, currentText) => {
+    //use fs.writeFile to update the data
+    if (err) {
+      callback('Could not access file');
+    } else {
+      fs.writeFile(currentPath, text, (error) => {
+        if (error) {
+          throw ('Could not update file');
+        } else {
+          callback(null, {id: id, text: text});
+        }
+      });
+    }
+  });
+    //if error, callback error
+    //if success, callback the object with id and text
+
+
+
+
+
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
 };
 
 exports.delete = (id, callback) => {
