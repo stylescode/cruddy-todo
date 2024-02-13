@@ -53,28 +53,15 @@ exports.readOne = (id, callback) => {
   });
 };
 
-
-// check if current Path exists first
-
-
-
-// var text = items[id];
-// if (!text) {
-//   callback(new Error(`No item with id: ${id}`));
-// } else {
-//   callback(null, { id, text });
-// }
-
-
 exports.update = (id, text, callback) => {
   //create current path
   var currentPath = path.join(exports.dataDir, `${id}.txt`);
   //read the file for update
-  fs.readFile(currentPath, 'utf8', (err, currentText) => {
-    //use fs.writeFile to update the data
+  fs.readFile(currentPath, (err, currentText) => {
     if (err) {
       callback('Could not access file');
     } else {
+      //use fs.writeFile to update the data
       fs.writeFile(currentPath, text, (error) => {
         if (error) {
           throw ('Could not update file');
@@ -84,31 +71,26 @@ exports.update = (id, text, callback) => {
       });
     }
   });
-    //if error, callback error
-    //if success, callback the object with id and text
 
-
-
-
-
-  // var item = items[id];
-  // if (!item) {
-  //   callback(new Error(`No item with id: ${id}`));
-  // } else {
-  //   items[id] = text;
-  //   callback(null, { id, text });
-  // }
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+// find the current path for the file to delete with id
+  var currentPath = path.join(exports.dataDir, `${id}.txt`);
+// use fs.readfile
+  fs.readFile(currentPath, (err, text) => {
+    if (err) {
+      callback('Could not find file');
+    } else {
+      fs.unlink(currentPath, (error) => {
+        if (error) {
+          callback('Could not delete file');
+        } else {
+          callback(null);
+        }
+      });
+    }
+  });
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
