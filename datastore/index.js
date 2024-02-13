@@ -25,10 +25,24 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  var todoList = [];
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw ('Cannot read data directory');
+    }
+
+    //    -  "00001.txt"
+    // -  "00002.txt"
+    files.map((file) => {
+      var currentId = path.basename(file, '.txt');
+      todoList.push({id: currentId, text: currentId});
+    });
+    callback(null, todoList);
   });
-  callback(null, data);
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
